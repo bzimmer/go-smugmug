@@ -28,6 +28,28 @@ type FormattedValues struct {
 type URI interface{}
 type URIs map[string]URI
 
+type Pages struct {
+	Total          int  `json:"Total"`
+	Start          int  `json:"Start"`
+	Count          int  `json:"Count"`
+	RequestedCount int  `json:"RequestedCount"`
+	FirstPage      *URI `json:"FirstPage"`
+	LastPage       *URI `json:"LastPage"`
+	NextPage       *URI `json:"NextPage"`
+}
+
+func (p *Pages) Next() int {
+	return p.Start + p.Count
+}
+
+func (p *Pages) Previous() int {
+	return p.Start - p.Count
+}
+
+func (p *Pages) Remaining() int {
+	return p.Total - p.Start - p.Count
+}
+
 func parseURI(u URI) string {
 	switch u.(type) {
 	case string:
@@ -224,6 +246,22 @@ func unmarshallExpansions(uris *URIs, exp map[string]*json.RawMessage) (map[stri
 					return nil, err
 				}
 				ret[name] = res.LargestImage
+			}
+		case "UserAlbums":
+			if value, ok := exp[u]; ok {
+				res := struct{ UserAlbums *UserAlbums }{}
+				if err := json.Unmarshal(*value, &res); err != nil {
+					return nil, err
+				}
+				ret[name] = res
+			}
+		case "AlbumImages":
+			if value, ok := exp[u]; ok {
+				res := struct{ AlbumImage []*AlbumImage }{}
+				if err := json.Unmarshal(*value, &res); err != nil {
+					return nil, err
+				}
+				ret[name] = res.AlbumImage
 			}
 		}
 	}

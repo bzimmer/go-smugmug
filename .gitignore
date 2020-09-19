@@ -1,0 +1,5 @@
+.DS_Store
+example/example
+example/tmp
+.air.toml
+air.log

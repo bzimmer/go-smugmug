@@ -9,7 +9,7 @@ import (
 	"github.com/fatih/color"
 )
 
-var debug = true
+var debug = false
 
 func doDebug(data []byte, err error) {
 	if err != nil {

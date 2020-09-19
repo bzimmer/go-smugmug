@@ -130,36 +130,37 @@ type ImagesGetResponse struct {
 }
 
 type Image struct {
-	Altitude        int              `json:",omitempty"`
-	ArchivedMD5     string           `json:",omitempty"`
-	ArchivedSize    int              `json:",omitempty"`
-	ArchivedURI     string           `json:"ArchivedUri,omitempty"`
-	CanEdit         bool             `json:",omitempty"`
-	Caption         string           `json:",omitempty"`
-	Collectable     bool             `json:",omitempty"`
-	Date            *time.Time       `json:",omitempty"`
-	EZProject       bool             `json:",omitempty"`
-	FileName        string           `json:",omitempty"`
-	Format          string           `json:",omitempty"`
-	FormattedValues *FormattedValues `json:",omitempty"`
-	Hidden          bool             `json:",omitempty"`
-	ImageKey        string           `json:",omitempty"`
-	IsArchive       bool             `json:",omitempty"`
-	IsVideo         bool             `json:",omitempty"`
-	KeywordArray    []string         `json:",omitempty"`
-	Keywords        string           `json:",omitempty"`
-	LastUpdated     *time.Time       `json:",omitempty"`
-	Latitude        string           `json:",omitempty"`
-	Longitude       string           `json:",omitempty"`
-	OriginalHeight  int              `json:",omitempty"`
-	OriginalSize    int              `json:",omitempty"`
-	OriginalWidth   int              `json:",omitempty"`
-	Processing      bool             `json:",omitempty"`
-	Protected       bool             `json:",omitempty"`
-	ThumbnailURL    string           `json:"ThumbnailUrl,omitempty"`
-	Title           string           `json:",omitempty"`
-	UploadKey       string           `json:",omitempty"`
-	Watermarked     bool             `json:",omitempty"`
+	Altitude         int              `json:",omitempty"`
+	ArchivedMD5      string           `json:",omitempty"`
+	ArchivedSize     int              `json:",omitempty"`
+	ArchivedURI      string           `json:"ArchivedUri,omitempty"`
+	CanEdit          bool             `json:",omitempty"`
+	Caption          string           `json:",omitempty"`
+	Collectable      bool             `json:",omitempty"`
+	Date             *time.Time       `json:",omitempty"`
+	DateTimeUploaded *time.Time       `json:",omitempty"`
+	EZProject        bool             `json:",omitempty"`
+	FileName         string           `json:",omitempty"`
+	Format           string           `json:",omitempty"`
+	FormattedValues  *FormattedValues `json:",omitempty"`
+	Hidden           bool             `json:",omitempty"`
+	ImageKey         string           `json:",omitempty"`
+	IsArchive        bool             `json:",omitempty"`
+	IsVideo          bool             `json:",omitempty"`
+	KeywordArray     []string         `json:",omitempty"`
+	Keywords         string           `json:",omitempty"`
+	LastUpdated      *time.Time       `json:",omitempty"`
+	Latitude         string           `json:",omitempty"`
+	Longitude        string           `json:",omitempty"`
+	OriginalHeight   int              `json:",omitempty"`
+	OriginalSize     int              `json:",omitempty"`
+	OriginalWidth    int              `json:",omitempty"`
+	Processing       bool             `json:",omitempty"`
+	Protected        bool             `json:",omitempty"`
+	ThumbnailURL     string           `json:"ThumbnailUrl,omitempty"`
+	Title            string           `json:",omitempty"`
+	UploadKey        string           `json:",omitempty"`
+	Watermarked      bool             `json:",omitempty"`
 
 	ResponseLevel string
 	URI           string `json:"Uri,omitempty"`
@@ -175,9 +176,9 @@ type ImageDownload struct {
 }
 
 type ImageMetadata struct {
-	Altitude               string  `json:",omitempty"`
+	Altitude               int     `json:",omitempty"`
 	AltitudeReference      string  `json:",omitempty"`
-	Aperture               float32 `json:",omitempty"`
+	Aperture               string  `json:",omitempty"`
 	AudioCodec             string  `json:",omitempty"`
 	Author                 string  `json:",omitempty"`
 	AuthorTitle            string  `json:",omitempty"`
@@ -201,7 +202,7 @@ type ImageMetadata struct {
 	DateTimeCreated        string  `json:",omitempty"` // *time.Time
 	DateTimeModified       string  `json:",omitempty"` // *time.Time
 	DepthOfField           string  `json:",omitempty"`
-	DigitalZoomRatio       float32 `json:",omitempty"`
+	DigitalZoomRatio       string  `json:",omitempty"`
 	Duration               string  `json:",omitempty"`
 	Exposure               string  `json:",omitempty"`
 	ExposureCompensation   string  `json:",omitempty"`
@@ -228,7 +229,7 @@ type ImageMetadata struct {
 	MicroDateTimeCreated   string  `json:",omitempty"` // *time.Time
 	MicroDateTimeDigitized string  `json:",omitempty"` // *time.Time
 	Model                  string  `json:",omitempty"`
-	NormalizedLightValue   float32 `json:",omitempty"`
+	NormalizedLightValue   string  `json:",omitempty"`
 	Rating                 string  `json:",omitempty"`
 	Saturation             string  `json:",omitempty"`
 	ScaleFactor            string  `json:",omitempty"`

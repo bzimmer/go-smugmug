@@ -2,6 +2,7 @@ package smugmug
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -20,7 +21,15 @@ func NewAlbumsService(s *Service) *AlbumsService {
 func (r *AlbumsService) Get(id string) *AlbumsGetCall {
 	c := &AlbumsGetCall{s: r.s, urlParams: url.Values{}}
 	c.id = id
+	c.isAlbum = true
 	return c
+}
+
+func (r *AlbumsService) GetN(id string) *AlbumsGetCall {
+	c := &AlbumsGetCall{s: r.s, urlParams: url.Values{}}
+	c.id = id
+	c.isAlbum = false
+	return c.Paginate(0, 50)
 }
 
 type AlbumsServiceResponse struct {
@@ -29,15 +38,16 @@ type AlbumsServiceResponse struct {
 	Response struct {
 		ServiceResponse
 		Album *json.RawMessage
+		Pages *json.RawMessage
 	}
 	Expansions map[string]*json.RawMessage `json:",omitempty"`
 }
 
 type AlbumsGetCall struct {
-	id string
-
+	id        string
 	s         *Service
 	urlParams url.Values
+	isAlbum   bool
 }
 
 func (c *AlbumsGetCall) Expand(expansions []string) *AlbumsGetCall {
@@ -50,8 +60,20 @@ func (c *AlbumsGetCall) Filter(filter []string) *AlbumsGetCall {
 	return c
 }
 
+func (c *AlbumsGetCall) Paginate(start int, count int) *AlbumsGetCall {
+	c.urlParams.Set("start", fmt.Sprintf("%d", start))
+	c.urlParams.Set("count", fmt.Sprintf("%d", count))
+	return c
+}
+
 func (c *AlbumsGetCall) doRequest() (*http.Response, error) {
-	urls := resolveRelative(c.s.BasePath, "album/"+c.id)
+	var path string
+	if c.isAlbum {
+		path = "album/" + c.id
+	} else {
+		path = fmt.Sprintf("user/%s!albums", c.id)
+	}
+	urls := resolveRelative(c.s.BasePath, path)
 	urls += "?" + encodeURLParams(c.urlParams)
 	req, _ := http.NewRequest("GET", urls, nil)
 	c.s.setHeaders(req)
@@ -69,31 +91,47 @@ func (c *AlbumsGetCall) Do() (*AlbumsGetResponse, error) {
 	if err := checkResponse(res); err != nil {
 		return nil, err
 	}
-	albumsRes := &AlbumsServiceResponse{}
-	if err := json.NewDecoder(res.Body).Decode(&albumsRes); err != nil {
-		return nil, err
-	}
-	album := &Album{}
-	if err := json.Unmarshal(*albumsRes.Response.Album, &album); err != nil {
-		return nil, err
-	}
-	exp, err := unmarshallExpansions(album.URIs, albumsRes.Expansions)
-	if err != nil {
-		return nil, err
-	}
+
 	ret := &AlbumsGetResponse{
-		Album: album,
 		ServerResponse: ServerResponse{
 			Header:         res.Header,
 			HTTPStatusCode: res.StatusCode,
 		},
 	}
-	for name, v := range exp {
-		switch name {
-		case "Node":
-			ret.Node = v.(*Node)
-		case "User":
-			ret.User = v.(*User)
+
+	albumsRes := &AlbumsServiceResponse{}
+	if err := json.NewDecoder(res.Body).Decode(&albumsRes); err != nil {
+		return nil, err
+	}
+	if c.isAlbum {
+		ret.Album = &Album{}
+		if err := json.Unmarshal(*albumsRes.Response.Album, &ret.Album); err != nil {
+			return nil, err
+		}
+		exp, err := unmarshallExpansions(ret.Album.URIs, albumsRes.Expansions)
+		if err != nil {
+			return nil, err
+		}
+		for name, v := range exp {
+			switch name {
+			case "Node":
+				ret.Node = v.(*Node)
+			case "User":
+				ret.User = v.(*User)
+			case "AlbumImages":
+				ret.Album.Images = v.([]*AlbumImage)
+			}
+		}
+	} else {
+		ret.UserAlbums = &UserAlbums{
+			Album: []*Album{},
+			Pages: &Pages{},
+		}
+		if err := json.Unmarshal(*albumsRes.Response.Pages, &ret.UserAlbums.Pages); err != nil {
+			return nil, err
+		}
+		if err := json.Unmarshal(*albumsRes.Response.Album, &ret.UserAlbums.Album); err != nil {
+			return nil, err
 		}
 	}
 	return ret, nil
@@ -119,7 +157,8 @@ type AlbumsGetResponse struct {
 	// ParentFolders // deprecated
 	// SortAlbumImages
 	// UploadFromUri
-	User *User
+	User       *User
+	UserAlbums *UserAlbums
 
 	ServerResponse `json:"-"`
 }
@@ -180,4 +219,19 @@ type Album struct {
 	URIDescription string `json:"UriDescription,omitempty"`
 	URIs           *URIs  `json:"Uris,omitempty"`
 	WebURI         string `json:"WebUri,omitempty"`
+
+	Images []*Image `json:",omitempty"`
 }
+
+type UserAlbums struct {
+	URI         string   `json:",omitempty"`
+	Locator     string   `json:",omitempty"`
+	LocatorType string   `json:",omitempty"`
+	Album       []*Album `json:",omitempty"`
+	Pages       *Pages   `json:",omitempty"`
+}
+
+// This alias is needed to parse the JSON from SM
+//  In the API an expansion image is called an AlbumImage
+//  whereas it's an Image if you ask for it directly.
+type AlbumImage = Image

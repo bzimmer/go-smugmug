@@ -4,7 +4,7 @@ import (
 	"flag"
 	"log"
 
-	"github.com/pilwon/go-smugmug"
+	"github.com/pilwon/smugmug"
 )
 
 var (
@@ -15,11 +15,13 @@ var (
 )
 
 func Test(s *smugmug.Service) error {
+	// res, err := s.Users.GetAuthUser().Do()
 	// res, err := s.Users.GetAuthUser().Expand([]string{"Node"}).Do()
-	// res, err := s.Users.Get("cmac").Expand([]string{"Node"}).Do()
-	// res, err := s.Nodes.Get("zx4Fx").Expand([]string{"ChildNodes", "ParentNodes", "User"}).Do()
-	// res, err := s.Images.Get("SD5BL92-1").Expand([]string{"ImageAlbum", "ImageDownload", "ImageMetadata", "ImageOwner", "ImagePrices", "ImageSizeDetails", "ImageSizes", "LargestImage"}).Do()
-	res, err := s.Albums.Get("kQ3t8P").Expand([]string{"Node", "User"}).Do()
+	// res, err := s.Users.Get("cmac").Expand([]string{"Node", "ChildNodes"}).Do()
+	// res, err := s.Nodes.Get("hPMXH").Expand([]string{"ChildNodes", "ParentNodes", "User"}).Do()
+	res, err := s.Images.Get("SD5BL92-1").Expand([]string{"ImageAlbum", "ImageDownload", "ImageMetadata", "ImageOwner", "ImagePrices", "ImageSizeDetails", "ImageSizes", "LargestImage"}).Do()
+	// res, err := s.Albums.Get("kQ3t8P").Expand([]string{"Node", "User"}).Do()
+	// res, err := s.Albums.GetN("cmac").Expand([]string{"AlbumImages", "ImageSizeDetails"}).Paginate(400, 50).Do()
 	if err != nil {
 		return err
 	}

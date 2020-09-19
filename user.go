@@ -24,7 +24,7 @@ func (r *UsersService) Get(id string) *UsersGetCall {
 
 func (r *UsersService) GetAuthUser() *UsersGetCall {
 	c := &UsersGetCall{s: r.s, urlParams: url.Values{}}
-	c.useAuthUser = true
+	c.isAuthUser = true
 	return c
 }
 
@@ -39,8 +39,8 @@ type UsersServiceResponse struct {
 }
 
 type UsersGetCall struct {
-	id          string
-	useAuthUser bool
+	id         string
+	isAuthUser bool
 
 	s         *Service
 	urlParams url.Values
@@ -58,11 +58,14 @@ func (c *UsersGetCall) Filter(filter []string) *UsersGetCall {
 
 func (c *UsersGetCall) doRequest() (*http.Response, error) {
 	urls := resolveRelative(c.s.BasePath, "user/"+c.id)
-	if c.useAuthUser {
+	if c.isAuthUser {
 		urls = strings.TrimRight(c.s.BasePath, "/") + "!authuser"
 	}
 	urls += "?" + encodeURLParams(c.urlParams)
-	req, _ := http.NewRequest("GET", urls, nil)
+	req, err := http.NewRequest("GET", urls, nil)
+	if err != nil {
+		return nil, err
+	}
 	c.s.setHeaders(req)
 	debugRequest(req)
 	return c.s.client.Do(req)
@@ -101,6 +104,8 @@ func (c *UsersGetCall) Do() (*UsersGetResponse, error) {
 		switch name {
 		case "Node":
 			ret.Node = v.(*Node)
+		case "UserAlbums":
+			ret.UserAlbums = v.(*UserAlbums)
 		}
 	}
 	return ret, nil
@@ -118,7 +123,7 @@ type UsersGetResponse struct {
 	// SortUserFeaturedAlbums *SortUserFeaturedAlbums
 	// UrlPathLookup          *UrlPathLookup
 	// UserAlbumTemplates     *UserAlbumTemplates
-	// UserAlbums             []*Album
+	UserAlbums *UserAlbums
 	// UserContacts           *UserContacts
 	// UserCoupons            *UserCoupons
 	// UserDeletedAlbums      *UserDeletedAlbums
