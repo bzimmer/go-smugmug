@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 )
 
 type NodesService struct {
@@ -182,8 +181,8 @@ func (c *NodesCreateCall) Do() (*Node, error) {
 }
 
 type Node struct {
-	DateAdded             *time.Time       `json:",omitempty"`
-	DateModified          *time.Time       `json:",omitempty"`
+	DateAdded             *Time            `json:",omitempty"`
+	DateModified          *Time            `json:",omitempty"`
 	Description           string           `json:",omitempty"`
 	EffectivePrivacy      string           `json:",omitempty"`
 	EffectiveSecurityType string           `json:",omitempty"`

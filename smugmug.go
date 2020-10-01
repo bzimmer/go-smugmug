@@ -7,9 +7,36 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 const basePath = "https://api.smugmug.com/api/v2/"
+
+var dateFormats = []string{time.RFC3339, "2006-01-02T15:04:05", "2006-01-02"}
+
+// Time represents a datetime
+type Time struct {
+	time.Time
+}
+
+// UnmarshalJSON parses the string representing a Time struct
+func (t *Time) UnmarshalJSON(data []byte) error {
+	// data should be a string representing a time, possibly with a leading negative sign
+	date := string(data)
+	if strings.HasPrefix(date, `"-`) {
+		return nil
+	}
+
+	for _, fmt := range dateFormats {
+		r, err := time.Parse(`"`+fmt+`"`, date)
+		if err == nil {
+			t.Time = r
+			return nil
+		}
+	}
+
+	return fmt.Errorf("unable to parse '%s'", date)
+}
 
 type FormattedValues struct {
 	Caption struct {

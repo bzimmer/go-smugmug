@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 )
 
 type ImagesService struct {
@@ -137,8 +136,8 @@ type Image struct {
 	CanEdit          bool             `json:",omitempty"`
 	Caption          string           `json:",omitempty"`
 	Collectable      bool             `json:",omitempty"`
-	Date             *time.Time       `json:",omitempty"`
-	DateTimeUploaded *time.Time       `json:",omitempty"`
+	Date             *Time            `json:",omitempty"`
+	DateTimeUploaded *Time            `json:",omitempty"`
 	EZProject        bool             `json:",omitempty"`
 	FileName         string           `json:",omitempty"`
 	Format           string           `json:",omitempty"`
@@ -149,7 +148,7 @@ type Image struct {
 	IsVideo          bool             `json:",omitempty"`
 	KeywordArray     []string         `json:",omitempty"`
 	Keywords         string           `json:",omitempty"`
-	LastUpdated      *time.Time       `json:",omitempty"`
+	LastUpdated      *Time            `json:",omitempty"`
 	Latitude         string           `json:",omitempty"`
 	Longitude        string           `json:",omitempty"`
 	OriginalHeight   int              `json:",omitempty"`
@@ -197,10 +196,10 @@ type ImageMetadata struct {
 	CountryCode            string  `json:",omitempty"`
 	CreatorContactInfo     string  `json:",omitempty"`
 	Credit                 string  `json:",omitempty"`
-	DateCreated            string  `json:",omitempty"` // *time.Time
-	DateDigitized          string  `json:",omitempty"` // *time.Time
-	DateTimeCreated        string  `json:",omitempty"` // *time.Time
-	DateTimeModified       string  `json:",omitempty"` // *time.Time
+	DateCreated            *Time   `json:",omitempty"` // *time.Time
+	DateDigitized          *Time   `json:",omitempty"` // *time.Time
+	DateTimeCreated        *Time   `json:",omitempty"` // *time.Time
+	DateTimeModified       *Time   `json:",omitempty"` // *time.Time
 	DepthOfField           string  `json:",omitempty"`
 	DigitalZoomRatio       string  `json:",omitempty"`
 	Duration               string  `json:",omitempty"`

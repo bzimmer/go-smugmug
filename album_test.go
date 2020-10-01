@@ -2,13 +2,14 @@ package smugmug
 
 import (
 	"fmt"
-	"github.com/gorilla/pat"
-	"github.com/mrjones/oauth"
-	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/gorilla/pat"
+	"github.com/mrjones/oauth"
+	"github.com/stretchr/testify/assert"
 )
 
 func testAlbumsService(url string) *Service {
@@ -61,6 +62,22 @@ func Test_GetAlbum(t *testing.T) {
 	})
 }
 
+func Test_NoMoreAlbumsAvailable(t *testing.T) {
+	t.Parallel()
+	a := assert.New(t)
+
+	mockSmugmugAlbumNoResults(t, func(ts *httptest.Server) {
+		s := testAlbumsService(ts.URL)
+
+		res, err := s.Albums.GetN("cmac").Do()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		a.Equal(0, res.UserAlbums.Pages.Count)
+	})
+}
+
 func Test_GetAlbumN(t *testing.T) {
 	t.Parallel()
 	a := assert.New(t)
@@ -108,6 +125,38 @@ func Test_GetAlbumImages(t *testing.T) {
 
 		a.Equal(2, len(res.Album.Images))
 	})
+}
+
+func mockSmugmugAlbumNoResults(t *testing.T, f func(*httptest.Server)) {
+	p := pat.New()
+
+	p.Get("/api/v2/user/cmac!albums", func(res http.ResponseWriter, req *http.Request) {
+		var json = fmt.Sprintf(`
+		{
+			"Response": {
+				"Uri": "/api/v2/user/cmac!albums",
+				"Locator": "Album",
+				"LocatorType": "Objects",
+				"Pages": {
+					"Total": 436,
+					"Start": 400,
+					"Count": 0,
+					"RequestedCount": 15,
+					"FirstPage": "/api/v2/user/cmac!albums?_pretty=&_shorturis=&count=15&start=1",
+					"LastPage": "/api/v2/user/cmac!albums?_pretty=&_shorturis=&count=15&start=436",
+					"NextPage": "/api/v2/user/cmac!albums?_pretty=&_shorturis=&count=15&start=18",
+					"Misaligned": true
+				}
+			},
+			"Code": 200,
+			"Message": "Ok"
+		}`)
+		res.Write([]byte(json))
+	})
+	ts := httptest.NewServer(p)
+	defer ts.Close()
+
+	f(ts)
 }
 
 func mockSmugmugAlbumN(t *testing.T, start int, count int, f func(*httptest.Server)) {
